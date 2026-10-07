@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { usernameToEmail } from "@/lib/login";
 import { supabase } from "@/lib/supabase";
 
 export function LoginForm() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -15,14 +16,14 @@ export function LoginForm() {
     setBusy(true);
     setError(null);
     const { error: err } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: usernameToEmail(username),
       password,
     });
     setBusy(false);
     if (err) {
       setError(
         err.message === "Invalid login credentials"
-          ? "Email o contraseña incorrectos."
+          ? "Usuario o contraseña incorrectos."
           : err.message,
       );
     }
@@ -38,15 +39,18 @@ export function LoginForm() {
         <p className="mb-6 text-sm text-muted">Ingresá con tu usuario del equipo.</p>
 
         <label className="text-xs text-muted">
-          Email
+          Usuario
           <input
-            type="email"
+            type="text"
             required
             autoFocus
-            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            autoComplete="username"
             className="field mt-1"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </label>
         <label className="mt-3 block text-xs text-muted">
