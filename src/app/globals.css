@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #04060d;
+  --ink: #e8ecf6;
+  --muted: #8b93a7;
+  --line: rgba(255, 255, 255, 0.08);
+  --accent: #4f8cff;
+  --accent-2: #8b5cf6;
+  --warm: #f0803c;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background:
+    radial-gradient(60rem 40rem at 105% -10%, rgba(40, 90, 220, 0.35), transparent 60%),
+    radial-gradient(50rem 40rem at 110% 95%, rgba(240, 128, 60, 0.22), transparent 60%),
+    radial-gradient(40rem 30rem at -10% 110%, rgba(79, 140, 255, 0.1), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+}
+
+.glow-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 6px 24px -6px rgba(79, 140, 255, 0.6);
+}
+
+.field {
+  width: 100%;
+  border-radius: 0.6rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.5rem 0.7rem;
+  font-size: 0.875rem;
+  color: var(--ink);
+  outline: none;
+}
+.field:focus {
+  border-color: rgba(79, 140, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.18);
+}
+.field option {
+  background: #0b1020;
+}
+
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
