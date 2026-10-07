@@ -155,3 +155,12 @@ end $$;
 drop policy if exists "team_read_history" on lead_stage_history;
 create policy "team_read_history" on lead_stage_history
   for select to authenticated using (true);
+
+-- Permisos de acceso a la API. Las tablas no se exponen solas:
+-- solo el equipo con sesión iniciada (authenticated) y el servidor (service_role).
+-- El rol anónimo (anon) no recibe nada.
+grant usage on schema public to authenticated, service_role;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant all on all tables in schema public to service_role;
+-- El historial solo se lee desde el CRM; lo escribe el trigger
+revoke insert, update, delete on lead_stage_history from authenticated;
