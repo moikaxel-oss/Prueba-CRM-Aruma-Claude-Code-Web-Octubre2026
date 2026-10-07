@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   closestCorners,
   DndContext,
@@ -23,7 +23,14 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { Database, Plus } from "lucide-react";
-import { boardActions, useBoard } from "@/lib/board-store";
+import {
+  boardActions,
+  dismissSyncError,
+  isRemote,
+  loadRemote,
+  useBoard,
+  useSyncError,
+} from "@/lib/board-store";
 import { formatMoney } from "@/lib/format";
 import { ColumnView } from "./ColumnView";
 import { LeadCardBody } from "./LeadCard";
@@ -54,6 +61,7 @@ const collisionDetection: CollisionDetection = (args) => {
 
 export function Board() {
   const board = useBoard();
+  const syncError = useSyncError();
   const [campaign, setCampaign] = useState(ALL);
   const [dialog, setDialog] = useState<DialogTarget | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -72,6 +80,10 @@ export function Board() {
         : [],
     [board],
   );
+
+  useEffect(() => {
+    void loadRemote();
+  }, []);
 
   if (!board) {
     return <div className="glass flex-1 animate-pulse" aria-busy="true" />;
@@ -103,14 +115,21 @@ export function Board() {
   const onDragEnd = (e: DragEndEvent) => {
     setActiveId(null);
     const { active, over } = e;
-    if (!over || active.id === over.id) return;
     const a = String(active.id);
-    const o = String(over.id);
-    if (a.startsWith("col-") && o.startsWith("col-")) {
+    const o = over ? String(over.id) : "";
+    if (a.startsWith("col-") && o.startsWith("col-") && a !== o) {
       boardActions.reorderColumns(a.slice(4), o.slice(4));
-    } else if (a.startsWith("lead-") && o.startsWith("lead-")) {
-      boardActions.reorderLeads(a.slice(5), o.slice(5));
+    } else if (a.startsWith("lead-")) {
+      if (o.startsWith("lead-") && a !== o) {
+        boardActions.reorderLeads(a.slice(5), o.slice(5));
+      }
+      boardActions.persistLead(a.slice(5));
     }
+  };
+
+  const onDragCancel = () => {
+    if (activeId?.startsWith("lead-")) boardActions.persistLead(activeId.slice(5));
+    setActiveId(null);
   };
 
   const submitColumn = () => {
@@ -151,6 +170,7 @@ export function Board() {
           ))}
         </select>
 
+        {!isRemote && (
         <details className="relative">
           <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-xl border border-line px-3 py-2 text-sm text-muted hover:text-ink">
             <Database size={15} /> Datos
@@ -182,6 +202,7 @@ export function Board() {
             </button>
           </div>
         </details>
+        )}
 
         <button
           type="button"
@@ -195,13 +216,25 @@ export function Board() {
         </button>
       </header>
 
+      {syncError && (
+        <div
+          role="alert"
+          className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-2 text-sm text-red-200"
+        >
+          <span>{syncError}</span>
+          <button type="button" onClick={dismissSyncError} className="text-red-200/80 hover:text-white">
+            Cerrar
+          </button>
+        </div>
+      )}
+
       <DndContext
         sensors={sensors}
         collisionDetection={collisionDetection}
         onDragStart={onDragStart}
         onDragOver={onDragOver}
         onDragEnd={onDragEnd}
-        onDragCancel={() => setActiveId(null)}
+        onDragCancel={onDragCancel}
       >
         <div className="thin-scroll flex min-h-0 flex-1 items-start gap-4 overflow-x-auto pb-3">
           <SortableContext

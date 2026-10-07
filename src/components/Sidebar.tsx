@@ -1,4 +1,5 @@
 import { BarChart3, Kanban, Settings, Users } from "lucide-react";
+import { SignOutButton } from "./SignOutButton";
 
 const items = [
   { label: "Pipeline", icon: Kanban, active: true },
@@ -29,6 +30,7 @@ export function Sidebar() {
           <Icon size={20} />
         </button>
       ))}
+      <SignOutButton />
     </nav>
   );
 }

@@ -2,6 +2,7 @@ export type Column = {
   id: string;
   name: string;
   color: string;
+  position: number;
 };
 
 export type Lead = {
@@ -15,6 +16,7 @@ export type Lead = {
   value: number;
   notes: string;
   createdAt: string;
+  position: number;
 };
 
 export type BoardState = {
@@ -22,7 +24,7 @@ export type BoardState = {
   leads: Lead[];
 };
 
-export type LeadInput = Omit<Lead, "id" | "createdAt">;
+export type LeadInput = Omit<Lead, "id" | "createdAt" | "position">;
 
 export const COLUMN_COLORS = [
   "#4f8cff",
